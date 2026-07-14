@@ -1,9 +1,3 @@
-/*
- * chatSlice.js
- * ------------
- * Redux slice that stores the list of chat messages shown in the AI panel.
- * Each message looks like: { sender: "user" | "ai", text: "..." }
- */
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {

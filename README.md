@@ -9,16 +9,6 @@ The AI is powered by **LangGraph** + a **Groq LLM (`openai/gpt-oss-20b`)**, and 
 
 ---
 
-## What it looks like
-
-A split screen:
-
-- **Left:** the "Log HCP Interaction" form.
-- **Right:** an AI Assistant chat. You type a plain sentence, and the assistant
-  fills or edits the form on the left.
-
----
-
 ## Tech stack
 
 | Part     | Technology                   |
@@ -32,6 +22,21 @@ A split screen:
 
 ---
 
+## Role of the LangGraph agent
+
+The LangGraph agent is the decision-making core that manages every HCP
+interaction. When a sales rep types a message in the chat, the agent:
+
+1. **Interprets intent** — it reads the natural-language message and, using the
+   LLM, decides what the rep wants to do (log a new interaction, edit a field,
+   clear the form, schedule a follow-up, or summarize).
+2. **Extracts the data** — it pulls the relevant details out of plain English
+   (HCP name, date, sentiment, topics, materials, etc.).
+3. **Routes to the right tool** — based on that decision, it directs the request
+   to one of the 5 tools, each of which performs a specific action.
+4. **Returns the result** — the chosen tool updates the interaction form and/or
+   the database, and the agent replies to the rep in the chat.
+
 ## The 5 LangGraph tools
 
 | #   | Tool                      | What it does                                                                                                                                                                         |
@@ -42,7 +47,7 @@ A split screen:
 | 4   | **schedule_followup**     | Creates a follow-up task (defaults to one week out if no date is given) and saves it.                                                                                                |
 | 5   | **summarize_interaction** | Uses the LLM to write a short professional summary of the interaction currently in the form.                                                                                         |
 
-### How the agent works (design note)
+### How the agent works 
 
 `openai/gpt-oss-20b` is a small, fast model, and to keep the design simple and
 robust we don't rely on a model's built-in "function calling." Instead, the
@@ -65,10 +70,10 @@ START -> router (LLM picks a tool) -> [one of 5 tool nodes] -> END
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate        # on Windows: venv\Scripts\activate
+source venv/bin/activate        
 pip install -r requirements.txt
 
-cp .env.example .env            # then open .env and paste your Groq API key
+cp .env.example .env            
 uvicorn main:app --reload
 ```
 
@@ -80,7 +85,7 @@ The API now runs at http://localhost:8000
 > **Database:** this project uses MySQL. Make sure MySQL is running and create a
 > database called `hcp_crm` (`CREATE DATABASE hcp_crm;`), then set the
 > `DATABASE_URL` line in `.env` to your MySQL connection string, e.g.
-> `mysql+pymysql://root:YOURPASSWORD@localhost:3306/hcp_crm`.
+> `mysql+pymysql://root:PASSWORD@localhost:3306/hcp_crm`.
 
 ### 2. Frontend
 
@@ -96,7 +101,7 @@ Open the URL it prints (usually http://localhost:5173).
 
 ---
 
-## Try these prompts
+## Prompts
 
 1. **Log:** `Today I met with Dr. Smith and discussed Product X efficiency. The sentiment was positive and I shared the brochures.`
 2. **Edit:** `Sorry, the name was actually Dr. John and the sentiment was negative.`
@@ -106,25 +111,4 @@ Open the URL it prints (usually http://localhost:5173).
 
 ---
 
-## Project structure
 
-```
-hcp-crm/
-├── backend/
-│   ├── main.py            # FastAPI server + /chat endpoint
-│   ├── agent.py           # LangGraph agent + the 5 tools  <-- the brain
-│   ├── database.py        # database tables (SQLAlchemy)
-│   ├── requirements.txt
-│   └── .env.example
-└── frontend/
-    ├── index.html         # loads the Inter font
-    └── src/
-        ├── main.jsx       # app entry, connects Redux
-        ├── store.js       # Redux store
-        ├── formSlice.js   # form state (the AI fills this)
-        ├── chatSlice.js   # chat messages
-        ├── App.jsx        # split-screen layout
-        └── components/
-            ├── InteractionForm.jsx   # left panel
-            └── ChatPanel.jsx         # right panel (talks to backend)
-```

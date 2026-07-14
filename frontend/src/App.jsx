@@ -1,10 +1,3 @@
-/*
- * App.jsx
- * -------
- * The top-level component. It just draws the split screen:
- *   LEFT  = the interaction form
- *   RIGHT = the AI assistant chat
- */
 import InteractionForm from "./components/InteractionForm";
 import ChatPanel from "./components/ChatPanel";
 

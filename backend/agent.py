@@ -1,25 +1,3 @@
-"""
-agent.py
---------
-This is the BRAIN of the project. It builds a LangGraph "agent" that:
-
-  1. Reads what the user typed in the chat (e.g. "Today I met Dr. Smith...").
-  2. Asks the LLM (Groq gemma2-9b-it) to decide WHICH tool to use and to pull out
-     the important details (doctor name, date, sentiment, etc.) as JSON.
-  3. Routes to the matching tool. Each tool does one job and returns the fields
-     that should be filled into the form on the left side of the screen.
-
-Why this design?
-  gemma2-9b-it is a small, fast model whose built-in "function calling" is not
-  reliable. So instead of trusting that feature, we simply ask the model to
-  answer in JSON. This is easier to understand, easier to debug, and still uses
-  LangGraph + an LLM to drive every tool (which is what the task requires).
-
-The LangGraph "graph" looks like this:
-
-        START ->  router  ->  (one of the 5 tools)  ->  END
-"""
-
 import os
 import json
 import re
@@ -37,9 +15,7 @@ load_dotenv()
 
 # ---------------------------------------------------------------------------
 # 1. The LLM
-# ---------------------------------------------------------------------------
-# temperature=0 means "be consistent / don't get creative" - good for pulling
-# out structured data.
+
 llm = ChatGroq(
     model="openai/gpt-oss-20b",
     temperature=0,
@@ -49,7 +25,7 @@ llm = ChatGroq(
 
 # ---------------------------------------------------------------------------
 # 2. The "state" - a shared bag of data that flows through the graph.
-# ---------------------------------------------------------------------------
+
 class AgentState(TypedDict):
     user_message: str      # what the user typed
     current_form: dict     # the form as it is right now
@@ -61,7 +37,7 @@ class AgentState(TypedDict):
 
 # ---------------------------------------------------------------------------
 # 3. The ROUTER node - the LLM reads the message and returns JSON.
-# ---------------------------------------------------------------------------
+
 ROUTER_PROMPT = """You are the AI assistant of a CRM used by pharmaceutical sales reps
 to log meetings with doctors (HCPs = Healthcare Professionals).
 
@@ -134,7 +110,6 @@ def router_node(state: AgentState) -> AgentState:
 
 # ---------------------------------------------------------------------------
 # 4. THE 5 TOOLS (each one is a node in the graph)
-# ---------------------------------------------------------------------------
 
 # Tool 1: LOG INTERACTION -------------------------------------------------
 def log_interaction_node(state: AgentState) -> AgentState:
@@ -267,7 +242,7 @@ def none_node(state: AgentState) -> AgentState:
 
 # ---------------------------------------------------------------------------
 # 5. WIRE THE GRAPH TOGETHER
-# ---------------------------------------------------------------------------
+
 def _choose_tool(state: AgentState) -> str:
     """This decides which tool node to jump to, based on the LLM's choice."""
     valid = {

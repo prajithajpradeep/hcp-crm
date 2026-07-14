@@ -1,12 +1,3 @@
-/*
- * ChatPanel.jsx
- * -------------
- * The AI assistant on the RIGHT side. When you send a message it:
- *   1. Shows your message in the chat.
- *   2. Sends your message + the current form to the Python backend.
- *   3. Gets back a reply + "formUpdates".
- *   4. Pushes those formUpdates into Redux, so the form on the left fills itself.
- */
 import { useState } from "react";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";

@@ -1,17 +1,3 @@
-"""
-main.py
--------
-The web server (using FastAPI). It exposes ONE main endpoint, /chat.
-
-The React frontend sends the user's chat message + the current form here.
-We run the LangGraph agent and send back:
-  - reply       : the assistant's text answer for the chat panel
-  - formUpdates : which form fields to fill/change on the left
-  - toolUsed    : which of the 5 tools ran (handy for the demo)
-
-Run it with:   uvicorn main:app --reload
-"""
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
