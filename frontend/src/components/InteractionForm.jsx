@@ -1,10 +1,3 @@
-/*
- * InteractionForm.jsx
- * -------------------
- * The form on the LEFT side. Notice it does NOT keep its own state - it reads
- * every value straight from Redux. That is how the AI is able to fill it: the
- * AI updates Redux, and this form re-draws itself automatically.
- */
 import { useSelector, useDispatch } from "react-redux";
 import { setField } from "../formSlice";
 
@@ -12,9 +5,14 @@ export default function InteractionForm() {
   const form = useSelector((state) => state.form);
   const dispatch = useDispatch();
 
-  // Helper so the fields can still be edited by hand if needed.
   const onChange = (field) => (e) =>
     dispatch(setField({ field, value: e.target.value }));
+
+  // The AI sends sentiment as "positive" / "neutral" / "negative".
+  // We lowercase it so the matching radio button lights up automatically.
+  const sentiment = (form.sentiment || "").toLowerCase();
+  const pickSentiment = (value) =>
+    dispatch(setField({ field: "sentiment", value }));
 
   return (
     <div>
@@ -72,22 +70,80 @@ export default function InteractionForm() {
         />
       </div>
 
-      <div className="field">
-        <label>Sentiment</label>
-        <input
-          placeholder="positive / neutral / negative"
-          value={form.sentiment}
-          onChange={onChange("sentiment")}
-        />
-      </div>
+      <p style={{ color: "#2563eb", fontSize: 13, cursor: "pointer", margin: "0 0 16px" }}>
+        🎙️ Summarize from Voice Note (Requires Consent)
+      </p>
 
       <p className="section-label">Materials Shared / Samples Distributed</p>
+
       <div className="field">
         <label>Materials Shared</label>
         <input
           placeholder="No materials added."
           value={form.materialsShared}
           onChange={onChange("materialsShared")}
+        />
+      </div>
+
+      <div className="field">
+        <label>Samples Distributed</label>
+        <input
+          placeholder="No samples added."
+          value={form.samplesDistributed}
+          onChange={onChange("samplesDistributed")}
+        />
+      </div>
+
+      <div className="field">
+        <label>Observed / Inferred HCP Sentiment</label>
+        <div style={{ display: "flex", gap: 24, marginTop: 4 }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontWeight: 400 }}>
+            <input
+              type="radio"
+              name="sentiment"
+              checked={sentiment === "positive"}
+              onChange={() => pickSentiment("positive")}
+            />
+            😊 Positive
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontWeight: 400 }}>
+            <input
+              type="radio"
+              name="sentiment"
+              checked={sentiment === "neutral"}
+              onChange={() => pickSentiment("neutral")}
+            />
+            😐 Neutral
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontWeight: 400 }}>
+            <input
+              type="radio"
+              name="sentiment"
+              checked={sentiment === "negative"}
+              onChange={() => pickSentiment("negative")}
+            />
+            😞 Negative
+          </label>
+        </div>
+      </div>
+
+      <div className="field">
+        <label>Outcomes</label>
+        <textarea
+          rows={3}
+          placeholder="Key outcomes or agreements..."
+          value={form.outcomes}
+          onChange={onChange("outcomes")}
+        />
+      </div>
+
+      <div className="field">
+        <label>Follow-up Actions</label>
+        <textarea
+          rows={3}
+          placeholder="Next steps..."
+          value={form.followUpActions}
+          onChange={onChange("followUpActions")}
         />
       </div>
     </div>
