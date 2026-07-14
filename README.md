@@ -39,15 +39,22 @@ interaction. When a sales rep types a message in the chat, the agent:
 
 ## The 5 LangGraph tools
 
-| #   | Tool                      | What it does                                                                                                                                                                         |
-| --- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1   | **log_interaction**       | Reads a natural-language description of a meeting, uses the LLM to extract HCP name, date, sentiment, topics, materials, etc., fills the form, and saves the record to the database. |
-| 2   | **edit_interaction**      | Changes only the specific fields the user mentions (e.g. "actually the name was Dr. John"), leaving everything else untouched.                                                       |
-| 3   | **clear_form**            | Wipes all form fields so the rep can start a fresh interaction.                                                                                                                      |
-| 4   | **schedule_followup**     | Creates a follow-up task (defaults to one week out if no date is given) and saves it.                                                                                                |
-| 5   | **summarize_interaction** | Uses the LLM to write a short professional summary of the interaction currently in the form.                                                                                         |
+**1. log_interaction**
+Reads a natural-language description of a meeting, uses the LLM to extract the HCP name, date, sentiment, topics, and materials, fills the form, and saves the record to the database.
 
-### How the agent works 
+**2. edit_interaction**
+Changes only the specific fields the user mentions (e.g. "actually the name was Dr. John"), leaving everything else untouched.
+
+**3. clear_form**
+Wipes all form fields so the rep can start a fresh interaction.
+
+**4. schedule_followup**
+Creates a follow-up task (defaults to one week out if no date is given) and saves it to the database.
+
+**5. summarize_interaction**
+Uses the LLM to write a short, professional summary of the interaction currently in the form. |
+
+### How the agent works
 
 `openai/gpt-oss-20b` is a small, fast model, and to keep the design simple and
 robust we don't rely on a model's built-in "function calling." Instead, the
@@ -70,14 +77,14 @@ START -> router (LLM picks a tool) -> [one of 5 tool nodes] -> END
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate        
+source venv/bin/activate
 pip install -r requirements.txt
 
-cp .env.example .env            
+cp .env.example .env
 uvicorn main:app --reload
 ```
 
-The API now runs at http://localhost:8000
+The API runs at http://localhost:8000
 
 > **Groq key:** get a free one at https://console.groq.com/keys and paste it into
 > `.env` as `GROQ_API_KEY`.
@@ -89,26 +96,43 @@ The API now runs at http://localhost:8000
 
 ### 2. Frontend
 
-Open a **second terminal**:
-
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Open the URL it prints (usually http://localhost:5173).
+Open the URL http://localhost:5173
 
 ---
 
 ## Prompts
 
-1. **Log:** `Today I met with Dr. Smith and discussed Product X efficiency. The sentiment was positive and I shared the brochures.`
-2. **Edit:** `Sorry, the name was actually Dr. John and the sentiment was negative.`
-3. **Clear:** `Clear the form.`
-4. **Follow-up:** `Schedule a follow-up with Dr. Smith next week.`
-5. **Summarize:** `Summarize this interaction.`
+1. **Log:** Today I met with Dr. Smith and discussed Product X efficiency. The sentiment was positive and I shared the brochures.
+2. **Edit:** Sorry, the name was actually Dr. John and the sentiment was negative.
+3. **Clear:** Clear the form.
+4. **Follow-up:** Schedule a follow-up with Dr. Smith next week.
+5. **Summarize:** Summarize this interaction.
 
 ---
 
+## Project structure
 
+**backend/** — Python + FastAPI + LangGraph
+
+- `main.py` — FastAPI server with the /chat endpoint
+- `agent.py` — the LangGraph agent and all 5 tools
+- `database.py` — database tables
+- `requirements.txt` — Python dependencies
+- `.env.example` — sample environment file
+
+**frontend/** — React + Redux (Vite)
+
+- `index.html` — loads the Google Inter font
+- `src/main.jsx` — app entry, connects Redux
+- `src/store.js` — Redux store
+- `src/formSlice.js` — form state
+- `src/chatSlice.js` — chat messages
+- `src/App.jsx` — split-screen layout
+- `src/components/InteractionForm.jsx` — left panel
+- `src/components/ChatPanel.jsx` — right panel
