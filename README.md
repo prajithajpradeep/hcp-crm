@@ -26,8 +26,8 @@ A split screen:
 | Frontend  | React + Redux Toolkit (Vite)       |
 | Backend   | Python + FastAPI                   |
 | AI agent  | LangGraph                          |
-| LLM       | Groq `gemma2-9b-it`                |
-| Database  | PostgreSQL (SQLite fallback)       |
+| LLM       | Groq `openai/gpt-oss-20b`          |
+| Database  | MySQL                              |
 | Font      | Google Inter                       |
 
 ---
