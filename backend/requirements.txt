@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+langgraph
+langchain-groq
+python-dotenv
+sqlalchemy
+pydantic
+psycopg2-binary   # only needed if you use PostgreSQL
