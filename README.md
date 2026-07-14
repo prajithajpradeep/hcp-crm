@@ -21,33 +21,33 @@ A split screen:
 
 ## Tech stack
 
-| Part      | Technology                         |
-| --------- | ---------------------------------- |
-| Frontend  | React + Redux Toolkit (Vite)       |
-| Backend   | Python + FastAPI                   |
-| AI agent  | LangGraph                          |
-| LLM       | Groq `openai/gpt-oss-20b`          |
-| Database  | MySQL                              |
-| Font      | Google Inter                       |
+| Part     | Technology                   |
+| -------- | ---------------------------- |
+| Frontend | React + Redux Toolkit (Vite) |
+| Backend  | Python + FastAPI             |
+| AI agent | LangGraph                    |
+| LLM      | Groq `openai/gpt-oss-20b`    |
+| Database | MySQL                        |
+| Font     | Google Inter                 |
 
 ---
 
 ## The 5 LangGraph tools
 
-| # | Tool                     | What it does |
-| - | ------------------------ | ------------ |
-| 1 | **log_interaction**      | Reads a natural-language description of a meeting, uses the LLM to extract HCP name, date, sentiment, topics, materials, etc., fills the form, and saves the record to the database. |
-| 2 | **edit_interaction**     | Changes only the specific fields the user mentions (e.g. "actually the name was Dr. John"), leaving everything else untouched. |
-| 3 | **clean_form**           | Wipes all form fields so the rep can start a fresh interaction. |
-| 4 | **schedule_followup**    | Creates a follow-up task (defaults to one week out if no date is given) and saves it. |
-| 5 | **summarize_interaction**| Uses the LLM to write a short professional summary of the interaction currently in the form. |
+| #   | Tool                      | What it does                                                                                                                                                                         |
+| --- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | **log_interaction**       | Reads a natural-language description of a meeting, uses the LLM to extract HCP name, date, sentiment, topics, materials, etc., fills the form, and saves the record to the database. |
+| 2   | **edit_interaction**      | Changes only the specific fields the user mentions (e.g. "actually the name was Dr. John"), leaving everything else untouched.                                                       |
+| 3   | **clear_form**            | Wipes all form fields so the rep can start a fresh interaction.                                                                                                                      |
+| 4   | **schedule_followup**     | Creates a follow-up task (defaults to one week out if no date is given) and saves it.                                                                                                |
+| 5   | **summarize_interaction** | Uses the LLM to write a short professional summary of the interaction currently in the form.                                                                                         |
 
 ### How the agent works (design note)
 
 `openai/gpt-oss-20b` is a small, fast model, and to keep the design simple and
 robust we don't rely on a model's built-in "function calling." Instead, the
-LangGraph **router node** asks the LLM to answer in plain JSON — *which tool to
-use and what values to extract* — and then routes to the matching tool node. The
+LangGraph **router node** asks the LLM to answer in plain JSON — _which tool to
+use and what values to extract_ — and then routes to the matching tool node. The
 LLM still makes every decision and does every extraction, so this fully satisfies
 the "must use LangGraph + an LLM to drive the tools" requirement, while being
 easier to debug.
@@ -127,3 +127,4 @@ hcp-crm/
         └── components/
             ├── InteractionForm.jsx   # left panel
             └── ChatPanel.jsx         # right panel (talks to backend)
+```
