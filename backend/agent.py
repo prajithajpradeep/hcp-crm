@@ -31,7 +31,7 @@ from langchain_groq import ChatGroq
 from langgraph.graph import StateGraph, START, END
 
 from database import SessionLocal, Interaction, FollowUp
-from hcp_directory import find_hcp
+#from hcp_directory import find_hcp
 
 load_dotenv()
 
@@ -78,8 +78,8 @@ You have exactly these 5 tools. Choose the ONE that best fits the user's message
    (words like "actually", "sorry", "change", "no it was"). Only put the fields they want
    to change into "args".
 
-3. "search_hcp" -> The user asks to look up / find info about a doctor. Put the doctor's
-   name in args as {{"hcpName": "..."}}.
+3. "clear_form" -> The user wants to clear/reset/empty the form and start over
+   (words like "clear", "reset", "start over", "new interaction"). args can be empty.
 
 4. "schedule_followup" -> The user wants to schedule/plan a follow-up. Extract
    {{"hcpName": "...", "followupDate": "YYYY-MM-DD", "note": "..."}} if given.
@@ -199,23 +199,24 @@ def edit_interaction_node(state: AgentState) -> AgentState:
     return state
 
 
-# Tool 3: SEARCH HCP ------------------------------------------------------
-def search_hcp_node(state: AgentState) -> AgentState:
-    """Look the doctor up in our directory and share what we know."""
-    name = state["tool_args"].get("hcpName", "")
-    record = find_hcp(name)
-
-    if record:
-        # Also auto-fill the HCP name field for convenience.
-        state["form_updates"] = {"hcpName": record["name"]}
-        state["reply"] = (
-            f"Found {record['name']} - {record['specialty']} at {record['hospital']}. "
-            f"Preferred product: {record['preferred_product']}. "
-            f"Last interaction: {record['last_interaction']}."
-        )
-    else:
-        state["form_updates"] = {}
-        state["reply"] = f"I couldn't find '{name}' in the directory."
+# Tool 3: CLEAR FORM ------------------------------------------------------
+def clear_form_node(state: AgentState) -> AgentState:
+    """Wipe every field so the user can start a fresh interaction."""
+    # Setting each field to "" empties it on the form.
+    state["form_updates"] = {
+        "hcpName": "",
+        "interactionType": "Meeting",
+        "date": "",
+        "time": "",
+        "attendees": "",
+        "topicsDiscussed": "",
+        "materialsShared": "",
+        "samplesDistributed": "",
+        "sentiment": "",
+        "outcomes": "",
+        "followUpActions": "",
+    }
+    state["reply"] = "Cleared the form. You can start logging a new interaction."
     return state
 
 
@@ -270,7 +271,7 @@ def none_node(state: AgentState) -> AgentState:
 def _choose_tool(state: AgentState) -> str:
     """This decides which tool node to jump to, based on the LLM's choice."""
     valid = {
-        "log_interaction", "edit_interaction", "search_hcp",
+        "log_interaction", "edit_interaction", "clear_form",
         "schedule_followup", "summarize_interaction",
     }
     return state["tool_name"] if state["tool_name"] in valid else "none"
@@ -282,7 +283,7 @@ def build_graph():
     graph.add_node("router", router_node)
     graph.add_node("log_interaction", log_interaction_node)
     graph.add_node("edit_interaction", edit_interaction_node)
-    graph.add_node("search_hcp", search_hcp_node)
+    graph.add_node("clear_form", clear_form_node)
     graph.add_node("schedule_followup", schedule_followup_node)
     graph.add_node("summarize_interaction", summarize_interaction_node)
     graph.add_node("none", none_node)
@@ -294,14 +295,14 @@ def build_graph():
     graph.add_conditional_edges("router", _choose_tool, {
         "log_interaction": "log_interaction",
         "edit_interaction": "edit_interaction",
-        "search_hcp": "search_hcp",
+        "clear_form": "clear_form",
         "schedule_followup": "schedule_followup",
         "summarize_interaction": "summarize_interaction",
         "none": "none",
     })
 
     # Every tool finishes the run.
-    for tool in ["log_interaction", "edit_interaction", "search_hcp",
+    for tool in ["log_interaction", "edit_interaction", "clear_form",
                  "schedule_followup", "summarize_interaction", "none"]:
         graph.add_edge(tool, END)
 
