@@ -27,14 +27,14 @@ The AI is powered by **LangGraph** + a **Groq LLM (`openai/gpt-oss-20b`)**, and 
 The LangGraph agent is the decision-making core that manages every HCP
 interaction. When a sales rep types a message in the chat, the agent:
 
-1. **Interprets intent** — it reads the natural-language message and, using the
+1. **Interprets intent** - it reads the natural-language message and, using the
    LLM, decides what the rep wants to do (log a new interaction, edit a field,
    clear the form, schedule a follow-up, or summarize).
-2. **Extracts the data** — it pulls the relevant details out of plain English
+2. **Extracts the data** - it pulls the relevant details out of plain English
    (HCP name, date, sentiment, topics, materials, etc.).
-3. **Routes to the right tool** — based on that decision, it directs the request
+3. **Routes to the right tool** - based on that decision, it directs the request
    to one of the 5 tools, each of which performs a specific action.
-4. **Returns the result** — the chosen tool updates the interaction form and/or
+4. **Returns the result** - the chosen tool updates the interaction form and/or
    the database, and the agent replies to the rep in the chat.
 
 ## The 5 LangGraph tools
@@ -52,14 +52,14 @@ Wipes all form fields so the rep can start a fresh interaction.
 Creates a follow-up task (defaults to one week out if no date is given) and saves it to the database.
 
 **5. summarize_interaction**
-Uses the LLM to write a short, professional summary of the interaction currently in the form. |
+Uses the LLM to write a short, professional summary of the interaction currently in the form. 
 
 ### How the agent works
 
 `openai/gpt-oss-20b` is a small, fast model, and to keep the design simple and
 robust we don't rely on a model's built-in "function calling." Instead, the
-LangGraph **router node** asks the LLM to answer in plain JSON — _which tool to
-use and what values to extract_ — and then routes to the matching tool node. The
+LangGraph **router node** asks the LLM to answer in plain JSON - which tool to
+use and what values to extract - and then routes to the matching tool node. The
 LLM still makes every decision and does every extraction, so this fully satisfies
 the "must use LangGraph + an LLM to drive the tools" requirement, while being
 easier to debug.
@@ -120,19 +120,19 @@ Open the URL http://localhost:5173
 
 **backend/** — Python + FastAPI + LangGraph
 
-- `main.py` — FastAPI server with the /chat endpoint
-- `agent.py` — the LangGraph agent and all 5 tools
-- `database.py` — database tables
-- `requirements.txt` — Python dependencies
-- `.env.example` — sample environment file
+- `main.py` - FastAPI server with the /chat endpoint
+- `agent.py` - the LangGraph agent and all 5 tools
+- `database.py` - database tables
+- `requirements.txt` - Python dependencies
+- `.env.example` - sample environment file
 
 **frontend/** — React + Redux (Vite)
 
-- `index.html` — loads the Google Inter font
-- `src/main.jsx` — app entry, connects Redux
-- `src/store.js` — Redux store
-- `src/formSlice.js` — form state
-- `src/chatSlice.js` — chat messages
-- `src/App.jsx` — split-screen layout
-- `src/components/InteractionForm.jsx` — left panel
-- `src/components/ChatPanel.jsx` — right panel
+- `index.html` - loads the Google Inter font
+- `src/main.jsx` - app entry, connects Redux
+- `src/store.js` - Redux store
+- `src/formSlice.js` - form state
+- `src/chatSlice.js` - chat messages
+- `src/App.jsx` - split-screen layout
+- `src/components/InteractionForm.jsx` = left panel
+- `src/components/ChatPanel.jsx` - right panel
